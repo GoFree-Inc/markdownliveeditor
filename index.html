@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Editor Online Free - Live Preview | MarkLiveEdit</title>
+    <meta name="description" content="Free online markdown editor with instant live preview. Upload, paste, or type markdown directly. Export to PDF &amp; HTML. No signup required.">
+    <meta name="keywords" content="markdown editor, markdown preview, online markdown, markdown to html, markdown to pdf, live preview, free markdown editor, markdown viewer">
+    <meta name="author" content="MarkLiveEdit">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://md.useaxra.com">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="MarkLiveEdit - Free Online Markdown Editor with Live Preview">
+    <meta property="og:description" content="Write markdown with instant live preview. Upload, paste, or type. Export to PDF &amp; HTML. 100% free, no signup.">
+    <meta property="og:url" content="https://md.useaxra.com">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="MarkLiveEdit">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MarkLiveEdit - Free Online Markdown Editor with Live Preview">
+    <meta name="twitter:description" content="Write markdown with instant live preview. Upload, paste, or type. Export to PDF &amp; HTML.">
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>M</text></svg>">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "MarkLiveEdit",
+      "url": "https://md.useaxra.com",
+      "description": "Free online markdown editor with instant live preview. Upload, paste, or type markdown directly. Export to PDF and HTML.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <link rel="stylesheet" href="/styles.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script defer src="/app.js"></script>
+  </head>
+  <body>
+    <!-- Background -->
+    <div class="bg-grain"></div>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <!-- Header -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#111"/>
+            <path d="M6 22V10h2.4l3.6 7.2L15.6 10H18v12h-2.2V14.6L12.6 20h-1.2L8.2 14.6V22H6zm14 0V10h2.4l2.4 4.8L27.2 10h2.4v12h-2.2v-7.4l-2.6 5h-1.2l-2.6-5V22H19z" fill="#fff"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>MarkLiveEdit</h1>
+          <p class="brand-tagline">Free Online Markdown Editor with Live Preview</p>
+        </div>
+      </div>
+      <nav class="actions">
+        <button id="upload-btn" type="button" class="btn btn-ghost" title="Upload .md file">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 10v2.667A1.334 1.334 0 0112.667 14H3.333A1.334 1.334 0 012 12.667V10M11.333 5.333L8 2 4.667 5.333M8 2v8"/></svg>
+          <span>Upload</span>
+        </button>
+        <input type="file" id="file-input" accept=".md,.markdown,.mdown,.mkd,.txt" hidden>
+        <button id="copy-html-btn" type="button" class="btn btn-ghost" title="Copy HTML to clipboard">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.333 6H7.333C6.597 6 6 6.597 6 7.333v6c0 .737.597 1.334 1.333 1.334h6c.737 0 1.334-.597 1.334-1.334v-6c0-.736-.597-1.333-1.334-1.333z"/><path d="M3.333 10h-.666a1.333 1.333 0 01-1.334-1.333v-6a1.333 1.333 0 011.334-1.334h6A1.333 1.333 0 0110 2.667v.666"/></svg>
+          <span>Copy HTML</span>
+        </button>
+        <button id="download-md-btn" type="button" class="btn btn-ghost" title="Download markdown file">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 10v2.667A1.334 1.334 0 0112.667 14H3.333A1.334 1.334 0 012 12.667V10M4.667 6.667L8 10l3.333-3.333M8 10V2"/></svg>
+          <span>Download .md</span>
+        </button>
+        <button id="clear-btn" type="button" class="btn btn-ghost" title="Clear editor">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h12M5.333 4V2.667a1.333 1.333 0 011.334-1.334h2.666a1.333 1.333 0 011.334 1.334V4m2 0v9.333a1.333 1.333 0 01-1.334 1.334H4.667a1.333 1.333 0 01-1.334-1.334V4h9.334z"/></svg>
+          <span>Clear</span>
+        </button>
+        <div class="actions-divider"></div>
+        <button id="export-btn" type="button" class="btn btn-primary" title="Export to PDF">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 10v2.667A1.334 1.334 0 0112.667 14H3.333A1.334 1.334 0 012 12.667V10M4.667 6.667L8 10l3.333-3.333M8 10V2"/></svg>
+          <span>Export PDF</span>
+        </button>
+      </nav>
+      <!-- Mobile menu toggle -->
+      <button id="mobile-menu-btn" type="button" class="btn btn-ghost mobile-only" aria-label="Menu">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 5h14M3 10h14M3 15h14"/></svg>
+      </button>
+    </header>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <button type="button" class="toolbar-btn" data-action="bold" title="Bold (Ctrl+B)"><strong>B</strong></button>
+        <button type="button" class="toolbar-btn" data-action="italic" title="Italic (Ctrl+I)"><em>I</em></button>
+        <button type="button" class="toolbar-btn" data-action="strikethrough" title="Strikethrough"><s>S</s></button>
+        <div class="toolbar-sep"></div>
+        <button type="button" class="toolbar-btn" data-action="h1" title="Heading 1">H1</button>
+        <button type="button" class="toolbar-btn" data-action="h2" title="Heading 2">H2</button>
+        <button type="button" class="toolbar-btn" data-action="h3" title="Heading 3">H3</button>
+        <div class="toolbar-sep"></div>
+        <button type="button" class="toolbar-btn" data-action="ul" title="Unordered List">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5.5 4H14M5.5 8H14M5.5 12H14"/><circle cx="2.5" cy="4" r="1" fill="currentColor"/><circle cx="2.5" cy="8" r="1" fill="currentColor"/><circle cx="2.5" cy="12" r="1" fill="currentColor"/></svg>
+        </button>
+        <button type="button" class="toolbar-btn" data-action="ol" title="Ordered List">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5.5 4H14M5.5 8H14M5.5 12H14"/><text x="1" y="5.5" font-size="5" fill="currentColor" stroke="none" font-family="system-ui">1</text><text x="1" y="9.5" font-size="5" fill="currentColor" stroke="none" font-family="system-ui">2</text><text x="1" y="13.5" font-size="5" fill="currentColor" stroke="none" font-family="system-ui">3</text></svg>
+        </button>
+        <button type="button" class="toolbar-btn" data-action="checklist" title="Checklist">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="2" width="4" height="4" rx="0.5"/><path d="M2.5 4.2l1 1 2-2M7.5 4H14M7.5 12H14"/><rect x="1.5" y="10" width="4" height="4" rx="0.5"/></svg>
+        </button>
+        <div class="toolbar-sep"></div>
+        <button type="button" class="toolbar-btn" data-action="code" title="Inline Code">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 4.5l3 3.5-3 3.5M5.5 4.5l-3 3.5 3 3.5"/></svg>
+        </button>
+        <button type="button" class="toolbar-btn" data-action="codeblock" title="Code Block">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 6l2 2-2 2M9 10h2"/></svg>
+        </button>
+        <button type="button" class="toolbar-btn" data-action="blockquote" title="Blockquote">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 3v10M6.5 5H13M6.5 8H11M6.5 11H13"/></svg>
+        </button>
+        <div class="toolbar-sep"></div>
+        <button type="button" class="toolbar-btn" data-action="link" title="Link">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.667 8.667a3.333 3.333 0 005.026.36l2-2a3.334 3.334 0 00-4.713-4.714l-1.147 1.14"/><path d="M9.333 7.333a3.333 3.333 0 00-5.026-.36l-2 2a3.333 3.333 0 004.713 4.714l1.14-1.14"/></svg>
+        </button>
+        <button type="button" class="toolbar-btn" data-action="image" title="Image">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="12" rx="2"/><circle cx="5.667" cy="5.667" r="1.167"/><path d="M14 10.333l-3.333-3.333L3 14"/></svg>
+        </button>
+        <button type="button" class="toolbar-btn" data-action="table" title="Table">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M2 6h12M2 10h12M6 2v12M10 2v12"/></svg>
+        </button>
+        <button type="button" class="toolbar-btn" data-action="hr" title="Horizontal Rule">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 8h12"/></svg>
+        </button>
+      </div>
+      <div class="toolbar-group toolbar-right">
+        <span id="word-count" class="toolbar-info">0 words</span>
+        <span class="toolbar-sep"></span>
+        <span id="char-count" class="toolbar-info">0 chars</span>
+      </div>
+    </div>
+
+    <!-- Workspace -->
+    <main class="workspace">
+      <section class="pane pane-editor" id="editor-pane">
+        <div class="pane-head">
+          <div class="pane-tab active">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.333 9.333V3.333A1.333 1.333 0 0012 2H4a1.333 1.333 0 00-1.333 1.333V12A1.333 1.333 0 004 13.333h4"/><path d="M10 12.667l1.667 1.666 3-3"/></svg>
+            Markdown
+          </div>
+          <span id="line-info" class="pane-meta">Ln 1, Col 1</span>
+        </div>
+        <div class="editor-wrap">
+          <textarea id="editor" spellcheck="false" aria-label="Markdown editor" placeholder="# Start typing your markdown here...
+
+You can also:
+  - Upload a .md file using the Upload button
+  - Paste markdown content directly
+  - Drag and drop a .md file into the editor
+
+## Quick Markdown Reference
+
+**Bold text** or __bold__
+*Italic text* or _italic_
+~~Strikethrough~~
+`inline code`
+[Link text](url)
+![Image alt](url)
+
+> Blockquote
+
+- Unordered list item
+1. Ordered list item
+
+```
+code block
+```"></textarea>
+        </div>
+      </section>
+
+      <div class="pane-divider" id="pane-divider" aria-label="Resize panels"></div>
+
+      <section class="pane pane-preview" id="preview-pane">
+        <div class="pane-head">
+          <div class="pane-tab active">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.333 8S3.333 2.667 8 2.667 14.667 8 14.667 8 12.667 13.333 8 13.333 1.333 8 1.333 8z"/><circle cx="8" cy="8" r="2"/></svg>
+            Preview
+          </div>
+          <span id="status" class="pane-meta status-ready">Ready</span>
+        </div>
+        <article id="preview" class="markdown-body"></article>
+      </section>
+    </main>
+
+    <!-- Drop overlay -->
+    <div id="drop-overlay" class="drop-overlay" hidden>
+      <div class="drop-overlay-content">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M42 30v8a4 4 0 01-4 4H10a4 4 0 01-4-4v-8M34 16L24 6 14 16M24 6v28"/></svg>
+        <p>Drop your .md file here</p>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" hidden></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>&copy; 2026 <a href="https://md.useaxra.com">MarkLiveEdit</a> &mdash; Free Online Markdown Editor with Live Preview. No data is sent to any server. Everything runs in your browser.</p>
+    </footer>
+  </body>
+</html>
