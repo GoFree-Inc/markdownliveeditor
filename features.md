@@ -1,36 +1,33 @@
-Here are features that would genuinely differentiate MarkLiveEdit    
-  from the sea of markdown editors:                                    
-                                                                       
-  High Impact, Low Effort:                                             
-  1. Syntax highlighting in the editor — color markdown syntax         
-  (headings, bold, links) in the textarea using a code mirror overlay  
-  or a contenteditable approach                                        
-  2. Theme toggle — light/dark mode switch; many users prefer light for
-   writing
-  3. Markdown cheat sheet panel — a slide-out reference panel for quick
-   syntax lookup
-  4. Shareable links — encode markdown into a URL hash so users can
-  share documents without a backend
-  5. Paste image support — paste screenshots from clipboard, convert to
-   base64 inline
+# MarkLiveEdit — Feature Tracker
 
-  Medium Effort, Strong Differentiation:
-  6. Multiple document tabs — work on several files at once, all saved
-  to localStorage
-  7. Focus/zen mode — hide preview, toolbar, chrome; just the editor
-  fullscreen with a word count
-  8. Find & replace — Ctrl+F / Ctrl+H within the editor
-  9. Auto-pairing — auto-close **, `, [], () when typing
-  10. Table of contents — auto-generated from headings in a collapsible
-   sidebar
-  11. Code syntax highlighting in preview — use Prism.js or
-  Highlight.js for fenced code blocks
+## Implemented
 
-  High Effort, Premium Feel:
-  12. Collaborative editing — real-time via WebRTC (no server needed)
-  13. Vim/Emacs keybindings — toggle for power users
-  14. Mermaid diagram support — render flowcharts and sequence diagrams
-   from markdown
-  15. Presentation mode — split markdown by --- and present as slides
-  16. Version history — save snapshots in localStorage, diff and
-  restore
+### High Impact, Low Effort
+- [x] **2. Theme Toggle** — Light/dark mode with system preference detection, localStorage persistence, anti-flash script, animated sun/moon icons
+- [x] **4. Shareable Links** — LZString-compressed URL hash encoding, clipboard copy, >8KB warning
+- [x] **5. Paste Image Support** — Paste screenshots from clipboard, converted to base64 inline markdown
+
+### Medium Effort, Strong Differentiation
+- [x] **3. Markdown Cheat Sheet Panel** — Slide-out reference panel with syntax, shortcuts, and diagram examples
+- [x] **7. Focus/Zen Mode** — Hides all chrome (topbar, toolbar, footer, preview), fullscreen centered editor, Esc to exit
+- [x] **8. Find & Replace** — Ctrl+F triggered, case-insensitive search, match navigation, single/all replace
+- [x] **9. Auto-pairing** — Auto-close `**`, `` ` ``, `[]`, `()`, `{}`, quotes; wrap selections; smart skip on closing char; backspace deletes pair
+- [x] **10. Table of Contents** — Auto-generated from headings (H1-H4), collapsible sidebar, click to scroll
+- [x] **11. Code Syntax Highlighting in Preview** — Prism.js with Tomorrow Night theme (dark) and GitHub-style (light), autoloader for 200+ languages, theme-aware PDF export
+
+### High Effort, Premium Feel
+- [x] **14. Mermaid Diagram Support** — Render flowcharts, sequence diagrams, etc. from fenced `mermaid` code blocks
+- [x] **16. Version History** — Save/restore named snapshots to localStorage, max 20, delete individual entries
+
+## Not Yet Implemented
+
+### High Impact
+- [ ] **1. Syntax Highlighting in Editor** — Requires replacing textarea with CodeMirror/Monaco (major architectural change)
+
+### Medium Effort
+- [ ] **6. Multiple Document Tabs** — Work on several files at once (significant UI rework)
+
+### High Effort
+- [ ] **12. Collaborative Editing** — Real-time via WebRTC (requires signaling server)
+- [ ] **13. Vim/Emacs Keybindings** — Power-user toggle (niche, complex)
+- [ ] **15. Presentation Mode** — Split by `---` and present as slides (significant feature)

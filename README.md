@@ -6,20 +6,49 @@ A fast, free, privacy-first markdown editor that runs entirely in your browser. 
 
 ## Features
 
+### Editor
 - **Live Preview** — instant side-by-side rendering as you type
-- **Upload** — open any `.md`, `.markdown`, or `.txt` file
-- **Drag & Drop** — drop files directly into the editor
 - **Formatting Toolbar** — bold, italic, headings, lists, code, tables, links, images
-- **Keyboard Shortcuts** — Ctrl+B (bold), Ctrl+I (italic), Ctrl+K (link), Tab (indent)
-- **Export PDF** — one-click PDF export via html2pdf.js
-- **Copy HTML** — copy rendered HTML to clipboard
-- **Download .md** — save your work as a markdown file
+- **Auto-pairing** — brackets, quotes, and markdown syntax auto-close; wraps selections
+- **Paste Images** — paste screenshots from clipboard (converted to base64)
+- **Find & Replace** — Ctrl+F to search, navigate matches, replace one or all
 - **Resizable Panels** — drag the divider to resize editor/preview
 - **Synchronized Scrolling** — editor and preview scroll in sync
+- **Focus/Zen Mode** — distraction-free writing with just the editor (Esc to exit)
+
+### Files & Export
+- **Upload** — open any `.md`, `.markdown`, or `.txt` file
+- **Drag & Drop** — drop files directly into the editor
+- **Export PDF** — one-click PDF export with syntax-highlighted code
+- **Copy HTML** — copy rendered HTML to clipboard
+- **Download .md** — save your work as a markdown file
+- **Share Link** — generate a compressed URL containing your document (no server needed)
+
+### Tools
+- **Light/Dark Theme** — toggle with system preference detection, persists across sessions
+- **Code Syntax Highlighting** — Prism.js with 200+ languages, theme-aware colors
+- **Mermaid Diagrams** — render flowcharts, sequences, and more from fenced code blocks
+- **Markdown Cheat Sheet** — slide-out quick reference panel
+- **Table of Contents** — auto-generated from headings, click to navigate
+- **Version History** — save and restore snapshots of your work
+- **In-App User Guide** — click the Guide button for full documentation
+
+### Core
 - **Auto-Save** — content persists in localStorage
-- **Dark Theme** — modern dark UI
 - **Responsive** — works on desktop and mobile
 - **GFM Support** — tables, task lists, strikethrough, and more
+- **Privacy-First** — 100% client-side, zero data sent to any server
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+B` | Bold |
+| `Ctrl+I` | Italic |
+| `Ctrl+K` | Insert link |
+| `Ctrl+F` | Find & Replace |
+| `Tab` | Indent (2 spaces) |
+| `Esc` | Exit Zen mode / Close panels |
 
 ## Quick Start
 
@@ -36,21 +65,16 @@ Or open `index.html` directly in your browser.
 | File | Description |
 |------|-------------|
 | `index.html` | Main page with SEO, Open Graph, and structured data |
-| `styles.css` | Full dark-theme stylesheet |
-| `app.js` | Editor logic, toolbar, export, drag & drop, sync scroll |
-
-## Scripts (PDF pipeline)
-
-The `scripts/` directory contains a separate Node.js Markdown-to-PDF pipeline:
-
-```bash
-npm run build     # Convert sample.md to PDF
-npm run preview   # Live preview server on localhost:4173
-```
+| `styles.css` | Full themed stylesheet (light + dark) |
+| `app.js` | Editor logic, toolbar, all features |
+| `features.md` | Feature tracker with implementation status |
 
 ## Tech Stack
 
 - [marked](https://github.com/markedjs/marked) — Markdown parser
 - [DOMPurify](https://github.com/cure53/DOMPurify) — HTML sanitizer
 - [html2pdf.js](https://github.com/eKoopmans/html2pdf.js) — PDF export
+- [Prism.js](https://prismjs.com/) — Code syntax highlighting
+- [LZString](https://github.com/pieroxy/lz-string) — URL-safe compression for share links
+- [Mermaid](https://mermaid.js.org/) — Diagram rendering from markdown
 - Vanilla HTML/CSS/JS — no build step required

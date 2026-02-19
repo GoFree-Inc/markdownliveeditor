@@ -26,6 +26,39 @@
   const paneDivider = document.getElementById("pane-divider");
   const editorPane = document.getElementById("editor-pane");
   const previewPane = document.getElementById("preview-pane");
+  const themeToggle = document.getElementById("theme-toggle");
+  const shareBtn = document.getElementById("share-btn");
+  const zenBtn = document.getElementById("zen-btn");
+  const findBtn = document.getElementById("find-btn");
+  const findBar = document.getElementById("find-bar");
+  const findInput = document.getElementById("find-input");
+  const findCount = document.getElementById("find-count");
+  const findPrev = document.getElementById("find-prev");
+  const findNext = document.getElementById("find-next");
+  const findToggleReplace = document.getElementById("find-toggle-replace");
+  const findClose = document.getElementById("find-close");
+  const replaceRow = document.getElementById("replace-row");
+  const replaceInput = document.getElementById("replace-input");
+  const replaceOne = document.getElementById("replace-one");
+  const replaceAllBtn = document.getElementById("replace-all-btn");
+  const cheatsheetBtn = document.getElementById("cheatsheet-btn");
+  const cheatsheetPanel = document.getElementById("cheatsheet-panel");
+  const cheatsheetClose = document.getElementById("cheatsheet-close");
+  const tocBtn = document.getElementById("toc-btn");
+  const tocPanel = document.getElementById("toc-panel");
+  const tocClose = document.getElementById("toc-close");
+  const tocList = document.getElementById("toc-list");
+  const tocEmpty = document.getElementById("toc-empty");
+  const guideBtn = document.getElementById("guide-btn");
+  const guideModal = document.getElementById("guide-modal");
+  const guideClose = document.getElementById("guide-close");
+  const guideContent = document.getElementById("guide-content");
+  const historyBtn = document.getElementById("history-btn");
+  const historyPanel = document.getElementById("history-panel");
+  const historyClose = document.getElementById("history-close");
+  const historySave = document.getElementById("history-save");
+  const historyList = document.getElementById("history-list");
+  const historyEmpty = document.getElementById("history-empty");
 
   // --- Marked config ---
   if (typeof marked !== "undefined") {
@@ -53,9 +86,551 @@
     return "document";
   }
 
+  // --- Theme ---
+  var THEME_KEY = "marklivedit_theme";
+
+  function getPreferredTheme() {
+    try {
+      var saved = localStorage.getItem(THEME_KEY);
+      if (saved) return saved;
+    } catch (_) {}
+    return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    var metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      metaTheme.setAttribute("content", theme === "light" ? "#f8f9fb" : "#0a0a0b");
+    }
+    try { localStorage.setItem(THEME_KEY, theme); } catch (_) {}
+  }
+
+  function toggleTheme() {
+    var current = document.documentElement.getAttribute("data-theme") || "dark";
+    applyTheme(current === "dark" ? "light" : "dark");
+  }
+
+  // --- Share URL ---
+  function shareAsUrl() {
+    var content = editor.value;
+    if (!content.trim()) {
+      showToast("Nothing to share", "error");
+      return;
+    }
+
+    if (typeof LZString === "undefined") {
+      showToast("Share library loading...", "error");
+      return;
+    }
+
+    var compressed = LZString.compressToEncodedURIComponent(content);
+    var hash = "#doc=" + compressed;
+    var fullUrl = window.location.origin + window.location.pathname + hash;
+
+    if (fullUrl.length > 8000) {
+      showToast("Content may be too large for URL sharing (>8KB)", "warning");
+    }
+
+    window.history.replaceState(null, "", hash);
+    navigator.clipboard.writeText(fullUrl).then(function () {
+      showToast("Share link copied to clipboard", "success");
+    }).catch(function () {
+      showToast("URL updated — copy it from the address bar", "success");
+    });
+  }
+
+  function loadFromHash() {
+    var hash = window.location.hash;
+    if (!hash || !hash.startsWith("#doc=")) return false;
+
+    if (typeof LZString === "undefined") return false;
+
+    try {
+      var compressed = hash.substring(5);
+      var content = LZString.decompressFromEncodedURIComponent(compressed);
+      if (content) {
+        editor.value = content;
+        saveContent();
+        // Clear the hash after loading so it doesn't stick
+        window.history.replaceState(null, "", window.location.pathname);
+        return true;
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  // --- Zen Mode ---
+  function toggleZen() {
+    document.body.classList.toggle("zen-mode");
+  }
+
+  function exitZen() {
+    document.body.classList.remove("zen-mode");
+  }
+
+  // --- Find & Replace ---
+  var findMatches = [];
+  var findCurrentIndex = -1;
+
+  function openFindBar() {
+    findBar.hidden = false;
+    findInput.focus();
+    findInput.select();
+  }
+
+  function closeFindBar() {
+    findBar.hidden = true;
+    replaceRow.hidden = true;
+    findMatches = [];
+    findCurrentIndex = -1;
+    findCount.textContent = "0/0";
+    editor.focus();
+  }
+
+  function performFind() {
+    var query = findInput.value;
+    findMatches = [];
+    findCurrentIndex = -1;
+
+    if (!query) {
+      findCount.textContent = "0/0";
+      return;
+    }
+
+    var text = editor.value;
+    var lowerText = text.toLowerCase();
+    var lowerQuery = query.toLowerCase();
+    var pos = 0;
+
+    while (true) {
+      var idx = lowerText.indexOf(lowerQuery, pos);
+      if (idx === -1) break;
+      findMatches.push(idx);
+      pos = idx + 1;
+    }
+
+    if (findMatches.length > 0) {
+      findCurrentIndex = 0;
+      highlightFindMatch();
+    }
+
+    updateFindCount();
+  }
+
+  function highlightFindMatch() {
+    if (findCurrentIndex < 0 || findCurrentIndex >= findMatches.length) return;
+    var idx = findMatches[findCurrentIndex];
+    var len = findInput.value.length;
+    editor.focus();
+    editor.setSelectionRange(idx, idx + len);
+
+    // Scroll the match into view
+    var linesBefore = editor.value.substring(0, idx).split("\n").length;
+    var lineHeight = parseFloat(getComputedStyle(editor).lineHeight) || 20;
+    editor.scrollTop = Math.max(0, (linesBefore - 3) * lineHeight);
+  }
+
+  function findNextMatch() {
+    if (findMatches.length === 0) return;
+    findCurrentIndex = (findCurrentIndex + 1) % findMatches.length;
+    highlightFindMatch();
+    updateFindCount();
+  }
+
+  function findPrevMatch() {
+    if (findMatches.length === 0) return;
+    findCurrentIndex = (findCurrentIndex - 1 + findMatches.length) % findMatches.length;
+    highlightFindMatch();
+    updateFindCount();
+  }
+
+  function updateFindCount() {
+    if (findMatches.length === 0) {
+      findCount.textContent = "0/0";
+    } else {
+      findCount.textContent = (findCurrentIndex + 1) + "/" + findMatches.length;
+    }
+  }
+
+  function replaceCurrentMatch() {
+    if (findCurrentIndex < 0 || findCurrentIndex >= findMatches.length) return;
+    var idx = findMatches[findCurrentIndex];
+    var query = findInput.value;
+    var replacement = replaceInput.value;
+    var text = editor.value;
+
+    editor.value = text.substring(0, idx) + replacement + text.substring(idx + query.length);
+    editor.dispatchEvent(new Event("input"));
+    performFind();
+  }
+
+  function replaceAllMatches() {
+    var query = findInput.value;
+    if (!query) return;
+    var replacement = replaceInput.value;
+    var text = editor.value;
+    // Case-insensitive replace all
+    var escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    editor.value = text.replace(new RegExp(escaped, "gi"), replacement);
+    editor.dispatchEvent(new Event("input"));
+    performFind();
+    showToast("Replaced all occurrences", "success");
+  }
+
+  // --- Auto-pairing ---
+  var PAIRS = { "(": ")", "[": "]", "{": "}", '"': '"', "'": "'", "`": "`", "*": "*", "~": "~" };
+
+  function handleAutoPair(e) {
+    var ch = e.key;
+    var start = editor.selectionStart;
+    var end = editor.selectionEnd;
+    var text = editor.value;
+
+    // Opening bracket or quote with selection: wrap selection
+    if (PAIRS[ch] && start !== end) {
+      e.preventDefault();
+      var selected = text.substring(start, end);
+      var wrapped = ch + selected + PAIRS[ch];
+      editor.setRangeText(wrapped, start, end);
+      editor.selectionStart = start + 1;
+      editor.selectionEnd = end + 1;
+      editor.dispatchEvent(new Event("input"));
+      return;
+    }
+
+    // Opening bracket or quote without selection: insert pair
+    if (PAIRS[ch] && start === end) {
+      // For quotes/backtick/asterisk, only pair if next char is empty, space, or end
+      if (ch === '"' || ch === "'" || ch === "`" || ch === "*" || ch === "~") {
+        var nextChar = text[start];
+        if (nextChar && nextChar !== " " && nextChar !== "\n" && nextChar !== undefined) return;
+      }
+      e.preventDefault();
+      editor.setRangeText(ch + PAIRS[ch], start, end);
+      editor.selectionStart = editor.selectionEnd = start + 1;
+      editor.dispatchEvent(new Event("input"));
+      return;
+    }
+
+    // Closing bracket: skip if next char matches
+    var closingChars = Object.values(PAIRS);
+    if (closingChars.indexOf(ch) !== -1 && text[start] === ch) {
+      e.preventDefault();
+      editor.selectionStart = editor.selectionEnd = start + 1;
+      return;
+    }
+
+    // Backspace: delete pair if both sides are a pair
+    if (ch === "Backspace" && start === end && start > 0) {
+      var before = text[start - 1];
+      var after = text[start];
+      if (PAIRS[before] && PAIRS[before] === after) {
+        e.preventDefault();
+        editor.value = text.substring(0, start - 1) + text.substring(start + 1);
+        editor.selectionStart = editor.selectionEnd = start - 1;
+        editor.dispatchEvent(new Event("input"));
+      }
+    }
+  }
+
+  // --- Paste Image Support ---
+  function handlePaste(e) {
+    var items = e.clipboardData && e.clipboardData.items;
+    if (!items) return;
+
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf("image") !== -1) {
+        e.preventDefault();
+        var file = items[i].getAsFile();
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          var base64 = ev.target.result;
+          var markdown = "![pasted image](" + base64 + ")";
+          var start = editor.selectionStart;
+          editor.setRangeText(markdown, start, editor.selectionEnd);
+          editor.selectionStart = editor.selectionEnd = start + markdown.length;
+          editor.dispatchEvent(new Event("input"));
+          showToast("Image pasted", "success");
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+    }
+  }
+
+  // --- Table of Contents ---
+  function buildToc() {
+    var headings = preview.querySelectorAll("h1, h2, h3, h4");
+    tocList.innerHTML = "";
+
+    if (headings.length === 0) {
+      tocEmpty.hidden = false;
+      return;
+    }
+
+    tocEmpty.hidden = true;
+    headings.forEach(function (h, i) {
+      var level = parseInt(h.tagName[1]);
+      var li = document.createElement("li");
+      var a = document.createElement("a");
+      a.textContent = h.textContent;
+      a.href = "#";
+      a.className = "toc-h" + level;
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        h.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      li.appendChild(a);
+      tocList.appendChild(li);
+    });
+  }
+
+  // --- Mermaid Diagram Support ---
+  function renderMermaidBlocks() {
+    if (typeof mermaid === "undefined") return;
+
+    var codeBlocks = preview.querySelectorAll("code.language-mermaid");
+    codeBlocks.forEach(function (code, i) {
+      var pre = code.parentElement;
+      if (!pre || pre.tagName !== "PRE") return;
+
+      var graphDef = code.textContent;
+      var container = document.createElement("div");
+      container.className = "mermaid-container";
+      var id = "mermaid-" + Date.now() + "-" + i;
+
+      try {
+        mermaid.render(id, graphDef).then(function (result) {
+          container.innerHTML = result.svg;
+          pre.parentNode.replaceChild(container, pre);
+        }).catch(function () {
+          // Leave the code block as-is on error
+        });
+      } catch (_) {
+        // Sync error fallback
+      }
+    });
+  }
+
+  // --- Version History ---
+  var HISTORY_KEY = "marklivedit_history";
+
+  function getHistory() {
+    try {
+      var data = localStorage.getItem(HISTORY_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch (_) { return []; }
+  }
+
+  function saveHistory(history) {
+    try {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    } catch (_) {}
+  }
+
+  function saveSnapshot() {
+    var content = editor.value;
+    if (!content.trim()) {
+      showToast("Nothing to save", "error");
+      return;
+    }
+
+    var history = getHistory();
+    var snapshot = {
+      id: Date.now(),
+      time: new Date().toLocaleString(),
+      preview: content.substring(0, 80).replace(/\n/g, " "),
+      content: content
+    };
+
+    history.unshift(snapshot);
+    // Keep max 20 snapshots
+    if (history.length > 20) history = history.slice(0, 20);
+    saveHistory(history);
+    renderHistoryList();
+    showToast("Snapshot saved", "success");
+  }
+
+  function restoreSnapshot(id) {
+    var history = getHistory();
+    var snapshot = history.find(function (s) { return s.id === id; });
+    if (!snapshot) return;
+
+    if (editor.value.trim() && !confirm("Replace current content with this snapshot?")) return;
+
+    editor.value = snapshot.content;
+    editor.dispatchEvent(new Event("input"));
+    showToast("Snapshot restored", "success");
+  }
+
+  function deleteSnapshot(id) {
+    var history = getHistory();
+    history = history.filter(function (s) { return s.id !== id; });
+    saveHistory(history);
+    renderHistoryList();
+  }
+
+  function renderHistoryList() {
+    var history = getHistory();
+    historyList.innerHTML = "";
+
+    if (history.length === 0) {
+      historyEmpty.hidden = false;
+      return;
+    }
+
+    historyEmpty.hidden = true;
+    history.forEach(function (s) {
+      var li = document.createElement("li");
+      li.innerHTML =
+        '<div class="history-info">' +
+          '<span class="history-time">' + s.time + '</span>' +
+          '<span class="history-preview">' + (s.preview || "Empty").replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</span>' +
+        '</div>' +
+        '<div class="history-actions">' +
+          '<button class="history-restore" data-id="' + s.id + '">Restore</button>' +
+          '<button class="history-delete" data-id="' + s.id + '">&times;</button>' +
+        '</div>';
+      historyList.appendChild(li);
+    });
+
+    historyList.querySelectorAll(".history-restore").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        restoreSnapshot(parseInt(this.dataset.id));
+      });
+    });
+
+    historyList.querySelectorAll(".history-delete").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        deleteSnapshot(parseInt(this.dataset.id));
+      });
+    });
+  }
+
+  // --- Guide Modal ---
+  var guideLoaded = false;
+  var GUIDE_CONTENT = '# MarkLiveEdit User Guide\n\n' +
+    '**URL:** [md.useaxra.com](https://md.useaxra.com)\n\n' +
+    'A fast, free, privacy-first markdown editor that runs entirely in your browser. No data is sent to any server.\n\n' +
+    '---\n\n' +
+    '## Getting Started\n\n' +
+    '1. **Type markdown** in the left editor pane\n' +
+    '2. **See live preview** rendered instantly on the right\n' +
+    '3. **Export** your work as PDF, HTML, or download as `.md`\n\n' +
+    '---\n\n' +
+    '## Features\n\n' +
+    '### Editor\n' +
+    '- **Live Preview** \u2014 instant side-by-side rendering as you type\n' +
+    '- **Formatting Toolbar** \u2014 bold, italic, headings, lists, code, tables, links, images\n' +
+    '- **Auto-pairing** \u2014 brackets, quotes, and markdown syntax auto-close\n' +
+    '- **Paste Images** \u2014 paste screenshots from clipboard (converted to base64)\n' +
+    '- **Find & Replace** \u2014 Ctrl+F to search, with replace support\n' +
+    '- **Resizable Panels** \u2014 drag the divider to resize editor/preview\n' +
+    '- **Synchronized Scrolling** \u2014 editor and preview scroll in sync\n' +
+    '- **Focus/Zen Mode** \u2014 distraction-free writing, just the editor\n\n' +
+    '### Files & Export\n' +
+    '- **Upload** \u2014 open any `.md`, `.markdown`, or `.txt` file\n' +
+    '- **Drag & Drop** \u2014 drop files directly into the editor\n' +
+    '- **Export PDF** \u2014 one-click PDF export with syntax highlighting\n' +
+    '- **Copy HTML** \u2014 copy rendered HTML to clipboard\n' +
+    '- **Download .md** \u2014 save your work as a markdown file\n' +
+    '- **Share Link** \u2014 generate a URL that contains your document (no server needed)\n\n' +
+    '### Tools\n' +
+    '- **Theme Toggle** \u2014 switch between light and dark mode\n' +
+    '- **Markdown Cheat Sheet** \u2014 quick reference panel\n' +
+    '- **Table of Contents** \u2014 auto-generated from your headings\n' +
+    '- **Version History** \u2014 save and restore snapshots of your work\n' +
+    '- **Mermaid Diagrams** \u2014 render flowcharts and diagrams from code blocks\n' +
+    '- **Code Syntax Highlighting** \u2014 Prism.js powered highlighting in preview\n\n' +
+    '---\n\n' +
+    '## Keyboard Shortcuts\n\n' +
+    '| Shortcut | Action |\n' +
+    '|----------|--------|\n' +
+    '| `Ctrl+B` | Bold |\n' +
+    '| `Ctrl+I` | Italic |\n' +
+    '| `Ctrl+K` | Insert link |\n' +
+    '| `Ctrl+F` | Find & Replace |\n' +
+    '| `Tab` | Indent (2 spaces) |\n' +
+    '| `Esc` | Exit Zen mode / Close panels |\n\n' +
+    '---\n\n' +
+    '## Markdown Syntax\n\n' +
+    '### Headings\n' +
+    '```\n# Heading 1\n## Heading 2\n### Heading 3\n```\n\n' +
+    '### Emphasis\n' +
+    '```\n**bold** *italic* ~~strikethrough~~ `inline code`\n```\n\n' +
+    '### Lists\n' +
+    '```\n- Unordered item\n1. Ordered item\n- [ ] Task item\n```\n\n' +
+    '### Links & Images\n' +
+    '```\n[link text](url)\n![alt text](image-url)\n```\n\n' +
+    '### Code Blocks\n' +
+    '````\n```javascript\nconst greeting = "Hello, world!";\nconsole.log(greeting);\n```\n````\n\n' +
+    '### Mermaid Diagrams\n' +
+    '````\n```mermaid\ngraph TD\n  A[Start] --> B{Decision}\n  B -->|Yes| C[Action]\n  B -->|No| D[End]\n```\n````\n\n' +
+    '### Tables\n' +
+    '```\n| Column 1 | Column 2 |\n|----------|----------|\n| Cell 1   | Cell 2   |\n```\n\n' +
+    '---\n\n' +
+    '## Privacy\n\n' +
+    'Everything runs 100% in your browser. No data is ever sent to any server. Your content is saved to `localStorage` on your device.\n\n' +
+    '---\n\n' +
+    'Built with love by [Axra](https://useaxra.com).\n';
+
+  function openGuide() {
+    guideModal.hidden = false;
+    if (!guideLoaded && typeof marked !== "undefined") {
+      var html = marked.parse(GUIDE_CONTENT);
+      if (typeof DOMPurify !== "undefined") {
+        html = DOMPurify.sanitize(html);
+      }
+      guideContent.innerHTML = html;
+      if (typeof Prism !== "undefined") {
+        Prism.highlightAllUnder(guideContent);
+      }
+      guideLoaded = true;
+    }
+  }
+
+  function closeGuide() {
+    guideModal.hidden = true;
+  }
+
+  // --- Panel toggles ---
+  function togglePanel(panel) {
+    // Close other panels
+    [cheatsheetPanel, tocPanel, historyPanel].forEach(function (p) {
+      if (p !== panel) p.hidden = true;
+    });
+    panel.hidden = !panel.hidden;
+
+    // Build TOC when opening
+    if (panel === tocPanel && !panel.hidden) {
+      buildToc();
+    }
+    // Build history when opening
+    if (panel === historyPanel && !panel.hidden) {
+      renderHistoryList();
+    }
+  }
+
   // --- Init ---
   function init() {
-    loadSavedContent();
+    applyTheme(getPreferredTheme());
+
+    // Configure Mermaid
+    if (typeof mermaid !== "undefined") {
+      mermaid.initialize({ startOnLoad: false, theme: "dark", securityLevel: "loose" });
+    }
+
+    // Configure Prism autoloader
+    if (typeof Prism !== "undefined" && Prism.plugins && Prism.plugins.autoloader) {
+      Prism.plugins.autoloader.languages_path = "https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/";
+    }
+
+    // Load from shared URL hash first, else localStorage
+    if (!loadFromHash()) {
+      loadSavedContent();
+    }
+
     renderPreview();
     updateStats();
     bindEvents();
@@ -95,6 +670,20 @@
         html = DOMPurify.sanitize(html);
       }
       preview.innerHTML = html;
+
+      // Syntax-highlight code blocks
+      if (typeof Prism !== "undefined") {
+        Prism.highlightAllUnder(preview);
+      }
+
+      // Render mermaid diagrams
+      renderMermaidBlocks();
+
+      // Update TOC if open
+      if (tocPanel && !tocPanel.hidden) {
+        buildToc();
+      }
+
       status.textContent = "Updated";
       status.className = "pane-meta status-ready";
     } catch (err) {
@@ -168,6 +757,10 @@
             e.preventDefault();
             insertFormat("[", "](url)");
             break;
+          case "f":
+            e.preventDefault();
+            openFindBar();
+            break;
         }
       }
     });
@@ -177,6 +770,108 @@
       btn.addEventListener("click", function () {
         handleToolbarAction(this.dataset.action);
       });
+    });
+
+    // Auto-pairing
+    editor.addEventListener("keydown", handleAutoPair);
+
+    // Paste image support
+    editor.addEventListener("paste", handlePaste);
+
+    // Theme & Share
+    if (themeToggle) {
+      themeToggle.addEventListener("click", toggleTheme);
+    }
+    if (shareBtn) {
+      shareBtn.addEventListener("click", shareAsUrl);
+    }
+
+    // Zen mode
+    if (zenBtn) {
+      zenBtn.addEventListener("click", toggleZen);
+    }
+
+    // Find & Replace
+    if (findBtn) {
+      findBtn.addEventListener("click", openFindBar);
+    }
+    if (findClose) {
+      findClose.addEventListener("click", closeFindBar);
+    }
+    if (findInput) {
+      findInput.addEventListener("input", performFind);
+      findInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") { e.shiftKey ? findPrevMatch() : findNextMatch(); e.preventDefault(); }
+        if (e.key === "Escape") closeFindBar();
+      });
+    }
+    if (findNext) findNext.addEventListener("click", findNextMatch);
+    if (findPrev) findPrev.addEventListener("click", findPrevMatch);
+    if (findToggleReplace) {
+      findToggleReplace.addEventListener("click", function () {
+        replaceRow.hidden = !replaceRow.hidden;
+        if (!replaceRow.hidden) replaceInput.focus();
+      });
+    }
+    if (replaceOne) replaceOne.addEventListener("click", replaceCurrentMatch);
+    if (replaceAllBtn) replaceAllBtn.addEventListener("click", replaceAllMatches);
+    if (replaceInput) {
+      replaceInput.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") closeFindBar();
+      });
+    }
+
+    // Cheat sheet
+    if (cheatsheetBtn) {
+      cheatsheetBtn.addEventListener("click", function () { togglePanel(cheatsheetPanel); });
+    }
+    if (cheatsheetClose) {
+      cheatsheetClose.addEventListener("click", function () { cheatsheetPanel.hidden = true; });
+    }
+
+    // Table of Contents
+    if (tocBtn) {
+      tocBtn.addEventListener("click", function () { togglePanel(tocPanel); });
+    }
+    if (tocClose) {
+      tocClose.addEventListener("click", function () { tocPanel.hidden = true; });
+    }
+
+    // Guide
+    if (guideBtn) {
+      guideBtn.addEventListener("click", openGuide);
+    }
+    if (guideClose) {
+      guideClose.addEventListener("click", closeGuide);
+    }
+    if (guideModal) {
+      guideModal.addEventListener("click", function (e) {
+        if (e.target === guideModal) closeGuide();
+      });
+    }
+
+    // Version History
+    if (historyBtn) {
+      historyBtn.addEventListener("click", function () { togglePanel(historyPanel); });
+    }
+    if (historyClose) {
+      historyClose.addEventListener("click", function () { historyPanel.hidden = true; });
+    }
+    if (historySave) {
+      historySave.addEventListener("click", saveSnapshot);
+    }
+
+    // Global Escape key
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        if (!findBar.hidden) closeFindBar();
+        else if (!guideModal.hidden) closeGuide();
+        else if (document.body.classList.contains("zen-mode")) exitZen();
+        else {
+          // Close any open panel
+          [cheatsheetPanel, tocPanel, historyPanel].forEach(function (p) { p.hidden = true; });
+        }
+      }
     });
 
     // Action buttons
@@ -472,6 +1167,19 @@
     });
 
     // Code blocks
+    var tokenColorMap = {
+      comment: "#6a737d", prolog: "#6a737d", doctype: "#6a737d", cdata: "#6a737d",
+      punctuation: "#24292e",
+      property: "#005cc5", tag: "#22863a", boolean: "#005cc5", number: "#005cc5",
+      constant: "#005cc5", symbol: "#005cc5", deleted: "#b31d28",
+      selector: "#22863a", "attr-name": "#6f42c1", string: "#032f62",
+      char: "#032f62", builtin: "#005cc5", inserted: "#22863a",
+      operator: "#d73a49", entity: "#d73a49", url: "#d73a49",
+      atrule: "#d73a49", "attr-value": "#032f62", keyword: "#d73a49",
+      function: "#6f42c1", "class-name": "#6f42c1",
+      regex: "#e36209", important: "#e36209", variable: "#e36209"
+    };
+
     root.querySelectorAll("pre").forEach(function (el) {
       el.style.cssText =
         "margin-bottom:1em;border-radius:8px;border:1px solid #e5e7eb;" +
@@ -484,6 +1192,17 @@
           "border-radius:0;font-size:0.8em;line-height:1.55;color:#1f2937;" +
           "font-family:SFMono-Regular,Consolas,'Liberation Mono',Menlo,Courier,monospace;" +
           "white-space:pre-wrap;word-wrap:break-word;overflow-wrap:break-word;";
+
+        // Apply light colors to Prism token spans
+        code.querySelectorAll(".token").forEach(function (tok) {
+          var classes = tok.className.split(/\s+/);
+          for (var c = 0; c < classes.length; c++) {
+            if (tokenColorMap[classes[c]]) {
+              tok.style.color = tokenColorMap[classes[c]];
+              break;
+            }
+          }
+        });
       }
     });
 
