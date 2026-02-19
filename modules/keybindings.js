@@ -431,6 +431,9 @@
 
   // --- Master Key Handler (capture phase) ---
   function masterKeyHandler(e) {
+    // Yield to presentation mode — it handles its own keys
+    if (MLE.isPresActive && MLE.isPresActive()) return;
+
     if (keyMode === "vim") {
       handleVimKeydown(e);
     } else if (keyMode === "emacs") {

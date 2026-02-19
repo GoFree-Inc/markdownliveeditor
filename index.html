@@ -431,14 +431,31 @@ code block
 
     <!-- Presentation Mode Overlay -->
     <div id="pres-overlay" class="pres-overlay" hidden>
-      <div class="pres-slide">
-        <article id="pres-slide-content" class="markdown-body pres-content"></article>
+      <div class="pres-backdrop"></div>
+      <div id="pres-slide-area" class="pres-slide-area">
+        <div class="pres-card">
+          <article id="pres-slide-content" class="pres-slide-inner"></article>
+        </div>
       </div>
-      <div class="pres-controls">
-        <button id="pres-prev" type="button" class="pres-nav" title="Previous slide">&larr;</button>
-        <span id="pres-counter" class="pres-counter">0 / 0</span>
-        <button id="pres-next" type="button" class="pres-nav" title="Next slide">&rarr;</button>
-        <button id="pres-exit" type="button" class="pres-nav pres-exit-btn" title="Exit (Esc)">Exit</button>
+      <div class="pres-chrome">
+        <div class="pres-progress"><div id="pres-progress-fill" class="pres-progress-fill"></div></div>
+        <div class="pres-controls">
+          <div class="pres-controls-left">
+            <button id="pres-prev" type="button" class="pres-btn" title="Previous (←)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <span id="pres-counter" class="pres-counter">1 / 1</span>
+            <button id="pres-next" type="button" class="pres-btn" title="Next (→)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+          <div class="pres-controls-right">
+            <span class="pres-hint">F fullscreen &middot; Esc exit</span>
+            <button id="pres-exit" type="button" class="pres-btn pres-btn-exit" title="Exit (Esc)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 

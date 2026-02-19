@@ -1,6 +1,6 @@
 /* =========================================================
    MarkLiveEdit — modules/presentation.js
-   Feature 15: Presentation Mode — split by --- into slides
+   Feature 15: Presentation Mode — bespoke slide deck
    ========================================================= */
 
 (function () {
@@ -8,41 +8,64 @@
 
   var slides = [];
   var currentSlide = 0;
+  var slideDirection = 0; // -1 = left, 1 = right, 0 = none
   var touchStartX = 0;
+  var isActive = false;
 
+  // ---- Slide parsing ----
   function parseSlides(markdown) {
-    // Split by horizontal rules (--- on its own line)
-    var parts = markdown.split(/\n---\n/);
-    return parts.map(function (part) { return part.trim(); }).filter(function (p) { return p.length > 0; });
+    // Split on --- that appears on its own line (with optional whitespace)
+    // Handles start-of-doc, end-of-doc, trailing spaces, Windows \r\n
+    var parts = markdown.split(/^[ \t]*---[ \t]*$/m);
+    return parts
+      .map(function (p) { return p.replace(/^\r?\n|\r?\n$/g, "").trim(); })
+      .filter(function (p) { return p.length > 0; });
   }
 
-  function renderSlideContent(markdown) {
-    if (typeof marked === "undefined") return markdown;
+  function renderSlideHTML(markdown) {
+    if (typeof marked === "undefined") return "<p>" + markdown + "</p>";
     var html = marked.parse(markdown);
-    if (typeof DOMPurify !== "undefined") {
-      html = DOMPurify.sanitize(html);
-    }
+    if (typeof DOMPurify !== "undefined") html = DOMPurify.sanitize(html);
     return html;
   }
 
-  function showSlide(index) {
-    var slideContent = document.getElementById("pres-slide-content");
-    var slideCounter = document.getElementById("pres-counter");
-    if (!slideContent || !slideCounter) return;
+  // ---- Slide rendering ----
+  function showSlide(index, direction) {
+    var content = document.getElementById("pres-slide-content");
+    var counter = document.getElementById("pres-counter");
+    var progress = document.getElementById("pres-progress-fill");
+    if (!content) return;
 
     currentSlide = Math.max(0, Math.min(index, slides.length - 1));
-    slideContent.innerHTML = renderSlideContent(slides[currentSlide]);
-    slideCounter.textContent = (currentSlide + 1) + " / " + slides.length;
+    slideDirection = direction || 0;
 
-    // Apply syntax highlighting
-    if (typeof Prism !== "undefined") {
-      Prism.highlightAllUnder(slideContent);
+    // Set transition direction class
+    content.className = "pres-slide-inner";
+    if (slideDirection !== 0) {
+      void content.offsetWidth; // reflow
+      content.classList.add(slideDirection > 0 ? "slide-in-right" : "slide-in-left");
+    } else {
+      content.classList.add("slide-in-up");
     }
 
-    // Render mermaid blocks
+    content.innerHTML = renderSlideHTML(slides[currentSlide]);
+
+    // Counter
+    if (counter) counter.textContent = (currentSlide + 1) + " / " + slides.length;
+
+    // Progress bar
+    if (progress) {
+      var pct = slides.length <= 1 ? 100 : ((currentSlide) / (slides.length - 1)) * 100;
+      progress.style.width = pct + "%";
+    }
+
+    // Syntax highlighting
+    if (typeof Prism !== "undefined") Prism.highlightAllUnder(content);
+
+    // Mermaid
     if (typeof mermaid !== "undefined") {
-      var codeBlocks = slideContent.querySelectorAll("code.language-mermaid");
-      codeBlocks.forEach(function (code, i) {
+      var blocks = content.querySelectorAll("code.language-mermaid");
+      blocks.forEach(function (code, i) {
         var pre = code.parentElement;
         if (!pre || pre.tagName !== "PRE") return;
         var graphDef = code.textContent;
@@ -52,30 +75,28 @@
         try {
           mermaid.render(id, graphDef).then(function (result) {
             container.innerHTML = result.svg;
-            pre.parentNode.replaceChild(container, pre);
+            if (pre.parentNode) pre.parentNode.replaceChild(container, pre);
           }).catch(function () {});
         } catch (_) {}
       });
     }
 
-    // Fade animation
-    slideContent.classList.remove("slide-fade-in");
-    void slideContent.offsetWidth;
-    slideContent.classList.add("slide-fade-in");
+    // Update nav button states
+    var prevBtn = document.getElementById("pres-prev");
+    var nextBtn = document.getElementById("pres-next");
+    if (prevBtn) prevBtn.disabled = currentSlide === 0;
+    if (nextBtn) nextBtn.disabled = currentSlide === slides.length - 1;
   }
 
   function nextSlide() {
-    if (currentSlide < slides.length - 1) {
-      showSlide(currentSlide + 1);
-    }
+    if (currentSlide < slides.length - 1) showSlide(currentSlide + 1, 1);
   }
 
   function prevSlide() {
-    if (currentSlide > 0) {
-      showSlide(currentSlide - 1);
-    }
+    if (currentSlide > 0) showSlide(currentSlide - 1, -1);
   }
 
+  // ---- Enter / Exit ----
   function enterPresentation() {
     var editor = document.getElementById("editor");
     var content = editor.value.trim();
@@ -86,82 +107,120 @@
 
     slides = parseSlides(content);
     if (slides.length === 0) {
-      MLE.showToast("No slides found", "error");
+      MLE.showToast("No slide content found. Separate slides with ---", "warning");
       return;
     }
 
+    isActive = true;
     currentSlide = 0;
+
     var overlay = document.getElementById("pres-overlay");
     overlay.hidden = false;
     document.body.classList.add("pres-active");
-    showSlide(0);
 
-    // Request fullscreen
+    showSlide(0, 0);
+
+    // Try fullscreen (non-blocking — presentation works without it)
     try {
-      if (overlay.requestFullscreen) overlay.requestFullscreen();
+      if (overlay.requestFullscreen) overlay.requestFullscreen().catch(function () {});
       else if (overlay.webkitRequestFullscreen) overlay.webkitRequestFullscreen();
     } catch (_) {}
   }
 
   function exitPresentation() {
+    if (!isActive) return;
+    isActive = false;
+
     var overlay = document.getElementById("pres-overlay");
     overlay.hidden = true;
     document.body.classList.remove("pres-active");
     slides = [];
     currentSlide = 0;
 
+    // Exit fullscreen only if we're in it
     try {
-      if (document.exitFullscreen) document.exitFullscreen();
-      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
+      else if (document.webkitFullscreenElement) document.webkitExitFullscreen();
     } catch (_) {}
   }
 
+  // ---- Keyboard handling ----
+  // Registered on CAPTURE phase at highest priority so vim/emacs can't eat our keys
   function handlePresKeydown(e) {
-    var overlay = document.getElementById("pres-overlay");
-    if (overlay.hidden) return;
+    if (!isActive) return;
 
     switch (e.key) {
       case "ArrowRight":
       case "ArrowDown":
       case " ":
+      case "PageDown":
         e.preventDefault();
+        e.stopImmediatePropagation();
         nextSlide();
         break;
       case "ArrowLeft":
       case "ArrowUp":
+      case "PageUp":
         e.preventDefault();
+        e.stopImmediatePropagation();
         prevSlide();
         break;
       case "Escape":
         e.preventDefault();
+        e.stopImmediatePropagation();
         exitPresentation();
         break;
       case "Home":
         e.preventDefault();
-        showSlide(0);
+        e.stopImmediatePropagation();
+        showSlide(0, -1);
         break;
       case "End":
         e.preventDefault();
-        showSlide(slides.length - 1);
+        e.stopImmediatePropagation();
+        showSlide(slides.length - 1, 1);
+        break;
+      case "f":
+      case "F":
+        // Toggle fullscreen
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        var overlay = document.getElementById("pres-overlay");
+        try {
+          if (document.fullscreenElement) document.exitFullscreen();
+          else overlay.requestFullscreen();
+        } catch (_) {}
         break;
     }
   }
 
+  // ---- Binding ----
   function bindPresentation() {
     var presBtn = document.getElementById("present-btn");
     var presExit = document.getElementById("pres-exit");
     var presPrev = document.getElementById("pres-prev");
     var presNext = document.getElementById("pres-next");
     var overlay = document.getElementById("pres-overlay");
+    var slideArea = document.getElementById("pres-slide-area");
 
     if (presBtn) presBtn.addEventListener("click", enterPresentation);
     if (presExit) presExit.addEventListener("click", exitPresentation);
     if (presPrev) presPrev.addEventListener("click", prevSlide);
     if (presNext) presNext.addEventListener("click", nextSlide);
 
-    document.addEventListener("keydown", handlePresKeydown);
+    // Click on slide area to advance
+    if (slideArea) {
+      slideArea.addEventListener("click", function (e) {
+        // Don't advance if clicking a link or interactive element
+        if (e.target.closest("a, button, input, code, pre")) return;
+        nextSlide();
+      });
+    }
 
-    // Touch swipe support
+    // Capture phase so this fires before vim/emacs keybinding handler
+    document.addEventListener("keydown", handlePresKeydown, true);
+
+    // Touch swipe
     if (overlay) {
       overlay.addEventListener("touchstart", function (e) {
         touchStartX = e.changedTouches[0].screenX;
@@ -176,15 +235,13 @@
       }, { passive: true });
     }
 
-    // Handle fullscreen exit
-    document.addEventListener("fullscreenchange", function () {
-      if (!document.fullscreenElement && !document.getElementById("pres-overlay").hidden) {
-        exitPresentation();
-      }
-    });
+    // Fullscreen exit should NOT auto-close presentation
+    // (user may have pressed Esc in fullscreen, which we catch above,
+    // or the browser blocked fullscreen entirely)
   }
 
   window.MLE = window.MLE || {};
   window.MLE.bindPresentation = bindPresentation;
   window.MLE.enterPresentation = enterPresentation;
+  window.MLE.isPresActive = function () { return isActive; };
 })();

@@ -200,6 +200,8 @@
     // Global Escape key
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") {
+        // Presentation mode handles its own Escape via capture phase
+        if (MLE.isPresActive && MLE.isPresActive()) return;
         if (findBar && !findBar.hidden && MLE.closeFindBar) MLE.closeFindBar();
         else if (guideModal && !guideModal.hidden && MLE.closeGuide) MLE.closeGuide();
         else if (document.body.classList.contains("zen-mode") && MLE.exitZen) MLE.exitZen();
