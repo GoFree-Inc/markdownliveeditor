@@ -9,6 +9,7 @@
 
 ### Medium Effort, Strong Differentiation
 - [x] **3. Markdown Cheat Sheet Panel** — Slide-out reference panel with syntax, shortcuts, and diagram examples
+- [x] **6. Multiple Document Tabs** — Tab bar with create/switch/rename/close, max 10 tabs, localStorage persistence, auto-migration from single content
 - [x] **7. Focus/Zen Mode** — Hides all chrome (topbar, toolbar, footer, preview), fullscreen centered editor, Esc to exit
 - [x] **8. Find & Replace** — Ctrl+F triggered, case-insensitive search, match navigation, single/all replace
 - [x] **9. Auto-pairing** — Auto-close `**`, `` ` ``, `[]`, `()`, `{}`, quotes; wrap selections; smart skip on closing char; backspace deletes pair
@@ -16,18 +17,13 @@
 - [x] **11. Code Syntax Highlighting in Preview** — Prism.js with Tomorrow Night theme (dark) and GitHub-style (light), autoloader for 200+ languages, theme-aware PDF export
 
 ### High Effort, Premium Feel
+- [x] **12. Collaborative Editing** — Real-time via PeerJS (WebRTC) with create/join rooms, full-content sync, peer count indicator, auto-cleanup on unload
+- [x] **13. Vim/Emacs Keybindings** — Vim normal/insert/visual modes (hjkl, dd, yy, p, w, b, gg, G, /search), Emacs (Ctrl+A/E/K/Y/N/P/F/B), mode indicator, cycle button, localStorage persistence
 - [x] **14. Mermaid Diagram Support** — Render flowcharts, sequence diagrams, etc. from fenced `mermaid` code blocks
+- [x] **15. Presentation Mode** — Split by `---` horizontal rules into slides, fullscreen overlay, arrow key/touch navigation, slide counter, fade transitions, Prism + Mermaid rendering in slides
 - [x] **16. Version History** — Save/restore named snapshots to localStorage, max 20, delete individual entries
 
 ## Not Yet Implemented
 
 ### High Impact
 - [ ] **1. Syntax Highlighting in Editor** — Requires replacing textarea with CodeMirror/Monaco (major architectural change)
-
-### Medium Effort
-- [ ] **6. Multiple Document Tabs** — Work on several files at once (significant UI rework)
-
-### High Effort
-- [ ] **12. Collaborative Editing** — Real-time via WebRTC (requires signaling server)
-- [ ] **13. Vim/Emacs Keybindings** — Power-user toggle (niche, complex)
-- [ ] **15. Presentation Mode** — Split by `---` and present as slides (significant feature)

@@ -13,19 +13,26 @@
     {
       "source": "/styles.css",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        { "key": "Cache-Control", "value": "public, s-maxage=86400, max-age=0, stale-while-revalidate=86400" }
       ]
     },
     {
       "source": "/app.js",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        { "key": "Cache-Control", "value": "public, s-maxage=86400, max-age=0, stale-while-revalidate=86400" }
+      ]
+    },
+    {
+      "source": "/modules/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, s-maxage=86400, max-age=0, stale-while-revalidate=86400" }
       ]
     },
     {
       "source": "/public/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        { "key": "Cache-Control", "value": "public, max-age=604800" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
       ]
     }
   ]
