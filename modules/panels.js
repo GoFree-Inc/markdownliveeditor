@@ -63,7 +63,7 @@
   // --- Guide Modal ---
   var guideLoaded = false;
   var GUIDE_CONTENT = '# MarkLiveEdit User Guide\n\n' +
-    '**URL:** [md.useaxra.com](https://md.useaxra.com)\n\n' +
+    '**URL:** [markdown.useaxra.com](https://markdown.useaxra.com)\n\n' +
     'A fast, free, privacy-first markdown editor that runs entirely in your browser. No data is sent to any server.\n\n' +
     '---\n\n' +
     '## Getting Started\n\n' +

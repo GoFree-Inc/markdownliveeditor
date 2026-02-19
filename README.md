@@ -1,6 +1,6 @@
 # MarkLiveEdit — Free Online Markdown Editor with Live Preview
 
-**URL:** [md.useaxra.com](https://md.useaxra.com)
+**URL:** [markdown.useaxra.com](https://markdown.useaxra.com)
 
 A fast, free, privacy-first markdown editor that runs entirely in your browser. No data is sent to any server.
 
