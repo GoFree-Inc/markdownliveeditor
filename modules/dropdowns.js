@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/dropdowns.js
+   Markdown Live Editor — modules/dropdowns.js
    Header dropdown menus (View, File)
    ========================================================= */
 

@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/presentation.js
+   Markdown Live Editor — modules/presentation.js
    Feature 15: Presentation Mode — bespoke slide deck
    ========================================================= */
 

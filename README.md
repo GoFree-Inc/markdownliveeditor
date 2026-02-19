@@ -1,4 +1,4 @@
-# MarkLiveEdit — Free Online Markdown Editor with Live Preview
+# Markdown Live Editor — Free Online Markdown Editor with Live Preview
 
 **URL:** [markdown.useaxra.com](https://markdown.useaxra.com)
 

@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/file-ops.js
+   Markdown Live Editor — modules/file-ops.js
    Upload, drag-drop, download, copy HTML, clear, paste image
    ========================================================= */
 

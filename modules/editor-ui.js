@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/editor-ui.js
+   Markdown Live Editor — modules/editor-ui.js
    Pane resize, sync scroll, toast, zen mode
    ========================================================= */
 

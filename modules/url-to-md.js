@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/url-to-md.js
+   Markdown Live Editor — modules/url-to-md.js
    URL-to-Markdown fetching + HTML paste conversion
    Uses Turndown.js for HTML -> Markdown conversion
    ========================================================= */

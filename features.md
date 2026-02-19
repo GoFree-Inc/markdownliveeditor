@@ -1,4 +1,4 @@
-# MarkLiveEdit — Feature Tracker
+# Markdown Live Editor — Feature Tracker
 
 ## Implemented
 

@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/panels.js
+   Markdown Live Editor — modules/panels.js
    TOC, mermaid, guide modal, panel toggles
    ========================================================= */
 
@@ -62,7 +62,7 @@
 
   // --- Guide Modal ---
   var guideLoaded = false;
-  var GUIDE_CONTENT = '# MarkLiveEdit User Guide\n\n' +
+  var GUIDE_CONTENT = '# Markdown Live Editor User Guide\n\n' +
     '**URL:** [markdown.useaxra.com](https://markdown.useaxra.com)\n\n' +
     'A fast, free, privacy-first markdown editor that runs entirely in your browser. No data is sent to any server.\n\n' +
     '---\n\n' +

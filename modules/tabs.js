@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/tabs.js
+   Markdown Live Editor — modules/tabs.js
    Feature 6: Multiple Document Tabs
    ========================================================= */
 

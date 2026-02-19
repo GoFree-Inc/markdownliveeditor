@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/collab.js
+   Markdown Live Editor — modules/collab.js
    Feature 12: Collaborative Editing via PeerJS (WebRTC)
    ========================================================= */
 

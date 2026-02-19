@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/theme.js
+   Markdown Live Editor — modules/theme.js
    Theme toggle with localStorage persistence
    ========================================================= */
 

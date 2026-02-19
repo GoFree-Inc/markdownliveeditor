@@ -1,4 +1,4 @@
-# MarkLiveEdit — Pro Features Roadmap
+# Markdown Live Editor — Pro Features Roadmap
 
 Top 20 monetizable features ranked by revenue potential and user demand.
 
@@ -35,7 +35,7 @@ Top 20 monetizable features ranked by revenue potential and user demand.
 - Multiple PDF themes (academic, resume, minimal, corporate)
 - Export to DOCX, EPUB, LaTeX, Confluence wiki markup
 - Batch export all tabs at once
-- Remove "Made with MarkLiveEdit" watermark
+- Remove "Made with Markdown Live Editor" watermark
 - **Why it prints money:** Professionals need polished output — freelancers, students, consultants pay for this
 
 ## 6. Image & File Hosting
@@ -136,7 +136,7 @@ Top 20 monetizable features ranked by revenue potential and user demand.
 - **Why it prints money:** Reduces switching cost — users who migrate their library are locked in
 
 ## 20. White-Label & Embed SDK
-- Embed MarkLiveEdit editor in any website via iframe/SDK
+- Embed Markdown Live Editor editor in any website via iframe/SDK
 - White-label: remove branding, add your own
 - Custom toolbar configuration per embed
 - Callback API for save, change, export events
@@ -156,3 +156,42 @@ Top 20 monetizable features ranked by revenue potential and user demand.
 ---
 
 *Revenue model: freemium with usage-based AI credits. Free tier stays generous to drive organic growth and SEO traffic.*
+
+
+Here are some options (domain and branding) grouped by vibe:
+
+Short & Punchy
+- Inkdown — ink + markdown, feels creative
+- Typora is taken, but Typemark — type + markdown
+- Quillpad — classic writing tool imagery
+- Markiva — mark + a clean suffix, sounds like a brand
+- Pendown — pen + markdown
+
+Developer-Leaning
+- MDCraft — crafting markdown
+- Markdeck — markdown + deck (nods to presentations too)
+- Writecode — bridges writing and code
+- Devscribe — developer + scribe
+
+Clean & Modern SaaS
+- Prosely — prose + clean suffix
+- Notemark — notes + markdown
+- Draftly — drafting, simple
+- Writely — Google had this pre-Docs, it's available again
+- Scribbe — scribe with a twist
+
+Premium / Monetization-Ready
+- Inkwell — classic, premium feel
+- Markwell — markdown done well
+- Penly — pen + ly, minimal
+- Versepad — verse + pad, literary
+
+My top 3 picks considering brandability, domain availability likelihood, and
+monetization:
+
+1. Inkdown — short, memorable, .com likely available as variant, works for free and
+paid tiers
+2. Markiva — unique, Google-able, sounds like a product people pay for
+3. Prosely — clean, modern, implies quality writing
+
+Want me to check domain availability for any of these, or do any stand out?

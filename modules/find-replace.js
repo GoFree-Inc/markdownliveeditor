@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/find-replace.js
+   Markdown Live Editor — modules/find-replace.js
    Find bar, match navigation, replace
    ========================================================= */
 

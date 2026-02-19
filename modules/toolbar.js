@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/toolbar.js
+   Markdown Live Editor — modules/toolbar.js
    Toolbar actions, insertFormat, insertBlock
    ========================================================= */
 

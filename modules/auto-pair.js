@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/auto-pair.js
+   Markdown Live Editor — modules/auto-pair.js
    Bracket/quote auto-pairing
    ========================================================= */
 

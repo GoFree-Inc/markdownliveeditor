@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — app.js (Core)
+   Markdown Live Editor — app.js (Core)
    Free Online Markdown Editor with Live Preview
    Modules loaded via MLE namespace from /modules/*.js
    ========================================================= */

@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/history.js
+   Markdown Live Editor — modules/history.js
    Version history snapshots
    ========================================================= */
 

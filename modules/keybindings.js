@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/keybindings.js
+   Markdown Live Editor — modules/keybindings.js
    Feature 13: Vim/Emacs Keybindings
    ========================================================= */
 

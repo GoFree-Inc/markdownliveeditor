@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — api/fetch.js
+   Markdown Live Editor — api/fetch.js
    Vercel serverless proxy: fetches a URL and returns its HTML
    ========================================================= */
 
@@ -57,7 +57,7 @@ function fetchUrl(urlStr, redirectCount) {
         timeout: 10000,
         headers: {
           "User-Agent":
-            "Mozilla/5.0 (compatible; MarkLiveEdit/1.0; +https://markdown.useaxra.com)",
+            "Mozilla/5.0 (compatible; Markdown Live Editor/1.0; +https://markdown.useaxra.com)",
           Accept: "text/html,application/xhtml+xml,*/*",
         },
       },

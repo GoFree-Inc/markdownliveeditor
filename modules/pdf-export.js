@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/pdf-export.js
+   Markdown Live Editor — modules/pdf-export.js
    PDF export with inline styles
    ========================================================= */
 

@@ -1,5 +1,5 @@
 /* =========================================================
-   MarkLiveEdit — modules/share.js
+   Markdown Live Editor — modules/share.js
    URL sharing with LZString compression
    ========================================================= */
 
