@@ -126,6 +126,7 @@ body {
   letter-spacing: -0.01em;
   line-height: 1.2;
   white-space: nowrap;
+  padding-top: 2px;
 }
 
 .brand-tagline {
@@ -641,6 +642,52 @@ body {
 .toast.toast-error {
   border-color: var(--error);
   background: rgba(239, 68, 68, 0.1);
+}
+
+/* --- Ad Banner (Header) --- */
+.ad-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: var(--accent-subtle);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 99px;
+  text-decoration: none;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.ad-banner:hover {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.ad-banner-text {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.ad-banner-text strong {
+  color: var(--text);
+}
+
+.ad-banner-cta {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--accent-hover);
+  background: rgba(99, 102, 241, 0.15);
+  padding: 2px 8px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+.ad-banner:hover .ad-banner-cta {
+  background: rgba(99, 102, 241, 0.25);
+}
+
+@media (max-width: 768px) {
+  .ad-banner { display: none; }
 }
 
 /* --- Footer --- */
