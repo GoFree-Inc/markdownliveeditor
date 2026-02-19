@@ -71,6 +71,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/peerjs@1/dist/peerjs.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/turndown@7/dist/turndown.min.js"></script>
 
     <!-- App modules (loaded in order via defer) -->
     <script defer src="/modules/editor-ui.js"></script>
@@ -87,6 +88,7 @@
     <script defer src="/modules/presentation.js"></script>
     <script defer src="/modules/keybindings.js"></script>
     <script defer src="/modules/collab.js"></script>
+    <script defer src="/modules/url-to-md.js"></script>
     <script defer src="/app.js"></script>
   </head>
   <body>
@@ -139,6 +141,10 @@
           <span>Upload</span>
         </button>
         <input type="file" id="file-input" accept=".md,.markdown,.mdown,.mkd,.txt" hidden>
+        <button id="url-to-md-btn" type="button" class="btn btn-ghost" title="Import URL as Markdown">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c-2 2.3-3 4.8-3 6.5s1 4.2 3 6.5M8 1.5c2 2.3 3 4.8 3 6.5s-1 4.2-3 6.5"/></svg>
+          <span>URL to MD</span>
+        </button>
         <button id="copy-html-btn" type="button" class="btn btn-ghost" title="Copy HTML to clipboard">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.333 6H7.333C6.597 6 6 6.597 6 7.333v6c0 .737.597 1.334 1.333 1.334h6c.737 0 1.334-.597 1.334-1.334v-6c0-.736-.597-1.333-1.334-1.333z"/><path d="M3.333 10h-.666a1.333 1.333 0 01-1.334-1.333v-6a1.333 1.333 0 011.334-1.334h6A1.333 1.333 0 0110 2.667v.666"/></svg>
           <span>Copy HTML</span>
@@ -426,6 +432,28 @@ code block
           <button id="guide-close" type="button" class="side-panel-close">&times;</button>
         </div>
         <article id="guide-content" class="markdown-body modal-body"></article>
+      </div>
+    </div>
+
+    <!-- URL to Markdown Modal -->
+    <div id="url-to-md-modal" class="modal-overlay" hidden>
+      <div class="modal-container" style="max-width:520px;">
+        <div class="modal-header">
+          <h2>Import URL as Markdown</h2>
+          <button id="url-to-md-close" type="button" class="side-panel-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="url-to-md-desc">Paste a URL to fetch and convert its content to Markdown.</p>
+          <div class="url-to-md-row">
+            <input id="url-to-md-input" type="url" class="url-to-md-input" placeholder="https://example.com/page" autocomplete="off" spellcheck="false">
+            <button id="url-to-md-fetch" type="button" class="btn btn-primary">Fetch</button>
+          </div>
+          <label class="url-to-md-option">
+            <input id="url-to-md-replace" type="checkbox" checked>
+            <span>Replace editor content</span>
+          </label>
+          <p id="url-to-md-status" class="url-to-md-status"></p>
+        </div>
       </div>
     </div>
 

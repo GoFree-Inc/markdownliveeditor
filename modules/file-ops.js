@@ -152,6 +152,32 @@
     if (!items) return;
 
     var editor = document.getElementById("editor");
+
+    // Check for HTML content first — convert to Markdown via Turndown
+    var htmlData = e.clipboardData.getData("text/html");
+    if (htmlData && MLE.convertHtmlToMarkdown) {
+      // Skip trivially simple HTML (plain text wrapped in a single span/p)
+      var tmp = document.createElement("div");
+      tmp.innerHTML = htmlData;
+      var hasRichContent =
+        tmp.querySelector("h1,h2,h3,h4,h5,h6,table,pre,code,ul,ol,blockquote,img,a,strong,em,li") !== null ||
+        tmp.querySelectorAll("p").length > 1;
+
+      if (hasRichContent) {
+        var md = MLE.convertHtmlToMarkdown(htmlData);
+        if (md && md.trim()) {
+          e.preventDefault();
+          var start = editor.selectionStart;
+          editor.setRangeText(md, start, editor.selectionEnd);
+          editor.selectionStart = editor.selectionEnd = start + md.length;
+          editor.dispatchEvent(new Event("input"));
+          MLE.showToast("Pasted as Markdown", "success");
+          return;
+        }
+      }
+    }
+
+    // Then check for images
     for (var i = 0; i < items.length; i++) {
       if (items[i].type.indexOf("image") !== -1) {
         e.preventDefault();

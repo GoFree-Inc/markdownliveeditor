@@ -1268,6 +1268,84 @@ body {
   padding: 24px;
 }
 
+/* --- URL to Markdown Modal --- */
+.url-to-md-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+.url-to-md-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.url-to-md-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.url-to-md-input:focus {
+  border-color: var(--accent);
+}
+
+.url-to-md-input::placeholder {
+  color: var(--text-muted);
+}
+
+.url-to-md-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.url-to-md-option input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+.url-to-md-status {
+  font-size: 0.78rem;
+  min-height: 1.2em;
+}
+
+.url-to-md-loading {
+  color: var(--accent);
+}
+
+.url-to-md-loading::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--accent);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: url-to-md-spin 0.6s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.url-to-md-error {
+  color: var(--error);
+}
+
+@keyframes url-to-md-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* --- Zen Mode --- */
 body.zen-mode .topbar,
 body.zen-mode .toolbar,

@@ -4,7 +4,7 @@
   "private": true,
   "description": "Convert Markdown to PDF with local live preview",
   "scripts": {
-    "build": "node scripts/markdown-to-pdf.js sample.md output/pdf/sample.pdf",
+    "pdf": "node scripts/markdown-to-pdf.js sample.md output/pdf/sample.pdf",
     "preview": "node scripts/live-preview.js sample.md output/pdf/sample.pdf 4173"
   }
 }

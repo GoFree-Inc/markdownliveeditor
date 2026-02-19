@@ -196,6 +196,7 @@
     if (MLE.bindPresentation) MLE.bindPresentation();
     if (MLE.bindKeybindings) MLE.bindKeybindings();
     if (MLE.bindCollab) MLE.bindCollab();
+    if (MLE.bindUrlToMd) MLE.bindUrlToMd();
 
     // Global Escape key
     document.addEventListener("keydown", function (e) {
@@ -204,6 +205,7 @@
         if (MLE.isPresActive && MLE.isPresActive()) return;
         if (findBar && !findBar.hidden && MLE.closeFindBar) MLE.closeFindBar();
         else if (guideModal && !guideModal.hidden && MLE.closeGuide) MLE.closeGuide();
+        else if (!document.getElementById("url-to-md-modal").hidden) document.getElementById("url-to-md-modal").hidden = true;
         else if (document.body.classList.contains("zen-mode") && MLE.exitZen) MLE.exitZen();
         else {
           var panels = [cheatsheetPanel, tocPanel, historyPanel];
