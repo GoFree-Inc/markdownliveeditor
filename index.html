@@ -74,6 +74,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/turndown@7/dist/turndown.min.js"></script>
 
     <!-- App modules (loaded in order via defer) -->
+    <script defer src="/modules/dropdowns.js"></script>
     <script defer src="/modules/editor-ui.js"></script>
     <script defer src="/modules/theme.js"></script>
     <script defer src="/modules/share.js"></script>
@@ -114,19 +115,65 @@
       </div>
 
       <nav class="actions">
-        <button id="guide-btn" type="button" class="btn btn-ghost" title="User Guide">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 013.94.5c0 1-1.44 1.5-1.44 1.5"/><circle cx="8" cy="11.5" r="0.5" fill="currentColor" stroke="none"/></svg>
-          <span>Guide</span>
-        </button>
-        <button id="history-btn" type="button" class="btn btn-ghost" title="Version History">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"/><path d="M8 4.5V8l2.5 1.5"/></svg>
-          <span>History</span>
-        </button>
-        <button id="collab-btn" type="button" class="btn btn-ghost" title="Collaborative Editing">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14v-1.5a2.5 2.5 0 00-2.5-2.5h-4A2.5 2.5 0 002 12.5V14"/><circle cx="6.5" cy="5" r="2.5"/><path d="M14 14v-1.5a2.5 2.5 0 00-1.75-2.38"/><path d="M10.5 2.13a2.5 2.5 0 010 4.75"/></svg>
-          <span>Collab</span>
-        </button>
+        <!-- View dropdown -->
+        <div class="dropdown" id="dropdown-view">
+          <button type="button" class="btn btn-ghost dropdown-trigger">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.333 8S3.333 2.667 8 2.667 14.667 8 14.667 8 12.667 13.333 8 13.333 1.333 8 1.333 8z"/><circle cx="8" cy="8" r="2"/></svg>
+            <span>View</span>
+            <svg class="dropdown-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 3.75L5 6.25l2.5-2.5"/></svg>
+          </button>
+          <div class="dropdown-menu">
+            <button id="guide-btn" type="button" class="dropdown-item" title="User Guide">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M6 6.5a2 2 0 013.94.5c0 1-1.44 1.5-1.44 1.5"/><circle cx="8" cy="11.5" r="0.5" fill="currentColor" stroke="none"/></svg>
+              <span>Guide</span>
+            </button>
+            <button id="history-btn" type="button" class="dropdown-item" title="Version History">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z"/><path d="M8 4.5V8l2.5 1.5"/></svg>
+              <span>History</span>
+            </button>
+            <button id="collab-btn" type="button" class="dropdown-item" title="Collaborative Editing">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14v-1.5a2.5 2.5 0 00-2.5-2.5h-4A2.5 2.5 0 002 12.5V14"/><circle cx="6.5" cy="5" r="2.5"/><path d="M14 14v-1.5a2.5 2.5 0 00-1.75-2.38"/><path d="M10.5 2.13a2.5 2.5 0 010 4.75"/></svg>
+              <span>Collab</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- File dropdown -->
+        <div class="dropdown" id="dropdown-file">
+          <button type="button" class="btn btn-ghost dropdown-trigger">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.333 14H2.667A.667.667 0 012 13.333V2.667A.667.667 0 012.667 2h6.666l4 4v7.333a.667.667 0 01-.667.667z"/><path d="M9.333 2v4h4"/></svg>
+            <span>File</span>
+            <svg class="dropdown-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 3.75L5 6.25l2.5-2.5"/></svg>
+          </button>
+          <div class="dropdown-menu dropdown-menu--right">
+            <button id="upload-btn" type="button" class="dropdown-item" title="Upload .md file">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 10v2.667A1.334 1.334 0 0112.667 14H3.333A1.334 1.334 0 012 12.667V10M11.333 5.333L8 2 4.667 5.333M8 2v8"/></svg>
+              <span>Upload .md</span>
+            </button>
+            <button id="url-to-md-btn" type="button" class="dropdown-item" title="Import URL as Markdown">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c-2 2.3-3 4.8-3 6.5s1 4.2 3 6.5M8 1.5c2 2.3 3 4.8 3 6.5s-1 4.2-3 6.5"/></svg>
+              <span>URL to Markdown</span>
+            </button>
+            <button id="copy-html-btn" type="button" class="dropdown-item" title="Copy HTML to clipboard">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.333 6H7.333C6.597 6 6 6.597 6 7.333v6c0 .737.597 1.334 1.333 1.334h6c.737 0 1.334-.597 1.334-1.334v-6c0-.736-.597-1.333-1.334-1.333z"/><path d="M3.333 10h-.666a1.333 1.333 0 01-1.334-1.333v-6a1.333 1.333 0 011.334-1.334h6A1.333 1.333 0 0110 2.667v.666"/></svg>
+              <span>Copy HTML</span>
+            </button>
+            <button id="download-md-btn" type="button" class="dropdown-item" title="Download markdown file">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 10v2.667A1.334 1.334 0 0112.667 14H3.333A1.334 1.334 0 012 12.667V10M4.667 6.667L8 10l3.333-3.333M8 10V2"/></svg>
+              <span>Download .md</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <button id="clear-btn" type="button" class="dropdown-item dropdown-item--danger" title="Clear editor">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h12M5.333 4V2.667a1.333 1.333 0 011.334-1.334h2.666a1.333 1.333 0 011.334 1.334V4m2 0v9.333a1.333 1.333 0 01-1.334 1.334H4.667a1.333 1.333 0 01-1.334-1.334V4h9.334z"/></svg>
+              <span>Clear Editor</span>
+            </button>
+          </div>
+        </div>
+
+        <input type="file" id="file-input" accept=".md,.markdown,.mdown,.mkd,.txt" hidden>
+
         <div class="actions-divider"></div>
+
         <button id="theme-toggle" type="button" class="theme-toggle" title="Toggle light/dark theme">
           <svg class="icon-sun" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1M8 13.5v1M3.4 3.4l.7.7M11.9 11.9l.7.7M1.5 8h1M13.5 8h1M3.4 12.6l.7-.7M11.9 4.1l.7-.7"/></svg>
           <svg class="icon-moon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 8.83A6 6 0 117.17 2 4.67 4.67 0 0014 8.83z"/></svg>
@@ -135,29 +182,9 @@
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="3" r="2"/><circle cx="4" cy="8" r="2"/><circle cx="12" cy="13" r="2"/><path d="M5.8 9.1l4.4 2.8M10.2 4.1l-4.4 2.8"/></svg>
           <span>Share</span>
         </button>
+
         <div class="actions-divider"></div>
-        <button id="upload-btn" type="button" class="btn btn-ghost" title="Upload .md file">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 10v2.667A1.334 1.334 0 0112.667 14H3.333A1.334 1.334 0 012 12.667V10M11.333 5.333L8 2 4.667 5.333M8 2v8"/></svg>
-          <span>Upload</span>
-        </button>
-        <input type="file" id="file-input" accept=".md,.markdown,.mdown,.mkd,.txt" hidden>
-        <button id="url-to-md-btn" type="button" class="btn btn-ghost" title="Import URL as Markdown">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c-2 2.3-3 4.8-3 6.5s1 4.2 3 6.5M8 1.5c2 2.3 3 4.8 3 6.5s-1 4.2-3 6.5"/></svg>
-          <span>URL to MD</span>
-        </button>
-        <button id="copy-html-btn" type="button" class="btn btn-ghost" title="Copy HTML to clipboard">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.333 6H7.333C6.597 6 6 6.597 6 7.333v6c0 .737.597 1.334 1.333 1.334h6c.737 0 1.334-.597 1.334-1.334v-6c0-.736-.597-1.333-1.334-1.333z"/><path d="M3.333 10h-.666a1.333 1.333 0 01-1.334-1.333v-6a1.333 1.333 0 011.334-1.334h6A1.333 1.333 0 0110 2.667v.666"/></svg>
-          <span>Copy HTML</span>
-        </button>
-        <button id="download-md-btn" type="button" class="btn btn-ghost" title="Download markdown file">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 10v2.667A1.334 1.334 0 0112.667 14H3.333A1.334 1.334 0 012 12.667V10M4.667 6.667L8 10l3.333-3.333M8 10V2"/></svg>
-          <span>Download .md</span>
-        </button>
-        <button id="clear-btn" type="button" class="btn btn-ghost" title="Clear editor">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h12M5.333 4V2.667a1.333 1.333 0 011.334-1.334h2.666a1.333 1.333 0 011.334 1.334V4m2 0v9.333a1.333 1.333 0 01-1.334 1.334H4.667a1.333 1.333 0 01-1.334-1.334V4h9.334z"/></svg>
-          <span>Clear</span>
-        </button>
-        <div class="actions-divider"></div>
+
         <button id="export-btn" type="button" class="btn btn-primary" title="Export to PDF">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 10v2.667A1.334 1.334 0 0112.667 14H3.333A1.334 1.334 0 012 12.667V10M4.667 6.667L8 10l3.333-3.333M8 10V2"/></svg>
           <span>Export PDF</span>

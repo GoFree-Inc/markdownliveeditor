@@ -283,6 +283,94 @@ body {
   margin: 0 4px;
 }
 
+/* --- Dropdown Menus --- */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-trigger {
+  gap: 4px;
+}
+
+.dropdown-chevron {
+  transition: transform var(--transition);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.dropdown.open .dropdown-chevron {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  min-width: 180px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity var(--transition), transform var(--transition), visibility var(--transition);
+}
+
+.dropdown.open .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-menu--right {
+  left: auto;
+  right: 0;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+  text-align: left;
+  line-height: 1;
+}
+
+.dropdown-item svg {
+  flex-shrink: 0;
+}
+
+.dropdown-item:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.dropdown-item--danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 4px 0;
+}
+
 /* --- Buttons --- */
 .btn {
   display: inline-flex;
@@ -882,10 +970,42 @@ body {
 
   .actions.open {
     display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
 
   .actions.open .btn span { display: inline; }
   .actions.open .actions-divider { display: block; width: 100%; height: 1px; margin: 4px 0; }
+
+  /* Dropdowns become inline accordions in mobile drawer */
+  .actions.open .dropdown {
+    width: 100%;
+  }
+
+  .actions.open .dropdown-trigger {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 8px 10px;
+  }
+
+  .actions.open .dropdown-trigger span { display: inline; }
+
+  .actions.open .dropdown-menu {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+    padding: 0 0 0 12px;
+    min-width: 0;
+    display: none;
+  }
+
+  .actions.open .dropdown.open .dropdown-menu {
+    display: block;
+  }
 
   .workspace {
     flex-direction: column;

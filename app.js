@@ -187,6 +187,7 @@
     }
 
     // Module bindings
+    if (MLE.bindDropdowns) MLE.bindDropdowns();
     if (MLE.bindToolbar) MLE.bindToolbar();
     if (MLE.bindFindReplace) MLE.bindFindReplace();
     if (MLE.bindFileOps) MLE.bindFileOps();
@@ -203,6 +204,11 @@
       if (e.key === "Escape") {
         // Presentation mode handles its own Escape via capture phase
         if (MLE.isPresActive && MLE.isPresActive()) return;
+        // Close open dropdown first
+        if (document.querySelector(".dropdown.open")) {
+          MLE.closeAllDropdowns();
+          return;
+        }
         if (findBar && !findBar.hidden && MLE.closeFindBar) MLE.closeFindBar();
         else if (guideModal && !guideModal.hidden && MLE.closeGuide) MLE.closeGuide();
         else if (!document.getElementById("url-to-md-modal").hidden) document.getElementById("url-to-md-modal").hidden = true;
