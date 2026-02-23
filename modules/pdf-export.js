@@ -151,6 +151,10 @@
     });
 
     // Tables
+    applyTableStyles(root);
+  }
+
+  function applyTableStyles(root) {
     root.querySelectorAll("table").forEach(function (el) {
       el.style.cssText =
         "width:100%;max-width:100%;border-collapse:collapse;margin-bottom:1em;" +
@@ -169,23 +173,289 @@
     });
   }
 
+  /* ---- Split oversized tables into smaller sub-tables ---- */
+  function splitOversizedTables(root, maxPx) {
+    // Process each direct-child table that exceeds the chunk height.
+    // Replacing it with several smaller tables keeps every element
+    // under the browser canvas-area limit for html2canvas.
+    var tables = Array.from(root.querySelectorAll("table"));
+    for (var t = 0; t < tables.length; t++) {
+      var table = tables[t];
+      var tH = table.offsetHeight || table.scrollHeight || 0;
+      if (tH <= maxPx) continue;
+
+      var thead = table.querySelector("thead");
+      var tbody = table.querySelector("tbody");
+      if (!tbody) continue;
+
+      var rows = [];
+      for (var r = 0; r < tbody.children.length; r++) {
+        if (tbody.children[r].tagName === "TR") rows.push(tbody.children[r]);
+      }
+      if (rows.length < 2) continue;
+
+      var theadH = thead ? (thead.offsetHeight || 40) : 0;
+      var subs = [];
+      var batch = [];
+      var batchH = theadH;
+
+      for (var r = 0; r < rows.length; r++) {
+        var rh = rows[r].offsetHeight || 25;
+        if (batchH + rh > maxPx && batch.length > 0) {
+          subs.push(buildSubTable(table, thead, batch));
+          batch = [];
+          batchH = theadH;
+        }
+        batch.push(rows[r]);
+        batchH += rh;
+      }
+      if (batch.length > 0) subs.push(buildSubTable(table, thead, batch));
+      if (subs.length <= 1) continue;
+
+      // Replace original table with the sub-tables
+      var parent = table.parentNode;
+      for (var s = 0; s < subs.length; s++) {
+        parent.insertBefore(subs[s], table);
+      }
+      parent.removeChild(table);
+    }
+  }
+
+  function buildSubTable(original, thead, rows) {
+    var t = original.cloneNode(false);          // table shell + inline styles
+    if (thead) t.appendChild(thead.cloneNode(true));
+    var tb = document.createElement("tbody");
+    tb.style.background = "#fff";
+    for (var i = 0; i < rows.length; i++) {
+      tb.appendChild(rows[i].cloneNode(true));
+    }
+    t.appendChild(tb);
+    // Re-apply even-row striping relative to this sub-table
+    var trs = t.querySelectorAll("tbody tr");
+    for (var j = 0; j < trs.length; j++) {
+      trs[j].style.background = (j % 2 === 1) ? "#f9fafb" : "#fff";
+    }
+    return t;
+  }
+
+  /* ---- Small-document export (original html2pdf path) ---- */
+  function exportPdfSimple(root, wrapper, status) {
+    var options = {
+      margin: [12, 12, 12, 12],
+      filename: MLE.getDocumentName() + ".pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+        scrollX: 0,
+        scrollY: 0,
+      },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      pagebreak: { mode: ["css", "legacy"] },
+    };
+
+    html2pdf().set(options).from(root).save().then(function () {
+      document.body.removeChild(wrapper);
+      status.textContent = "PDF exported";
+      status.className = "pane-meta status-ready";
+      MLE.showToast("PDF exported successfully", "success");
+    }).catch(function () {
+      if (wrapper.parentNode) document.body.removeChild(wrapper);
+      status.textContent = "Export failed";
+      status.className = "pane-meta";
+      MLE.showToast("PDF export failed", "error");
+    });
+  }
+
+  /* ---- Lazy-load standalone html2canvas + jsPDF for chunked export ---- */
+  function ensureChunkedLibs(callback) {
+    if (typeof window.html2canvas === "function" &&
+        typeof window.jspdf !== "undefined" && window.jspdf.jsPDF) {
+      callback();
+      return;
+    }
+    var remaining = 2;
+    function done() { if (--remaining === 0) callback(); }
+    function loadScript(src, cb) {
+      var s = document.createElement("script");
+      s.src = src;
+      s.onload = cb;
+      s.onerror = cb;
+      document.head.appendChild(s);
+    }
+    loadScript("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js", done);
+    loadScript("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js", done);
+  }
+
+  /* ---- Large-document export (chunked rendering) ---- */
+  function exportPdfChunked(root, wrapper, status) {
+    status.textContent = "Loading export libraries…";
+
+    ensureChunkedLibs(function () {
+      if (typeof window.html2canvas !== "function" ||
+          !window.jspdf || !window.jspdf.jsPDF) {
+        MLE.showToast("PDF libraries failed to load", "error");
+        if (wrapper.parentNode) document.body.removeChild(wrapper);
+        return;
+      }
+
+      var h2c   = window.html2canvas;
+      var JsPDF = window.jspdf.jsPDF;
+
+      // Constrain root width to A4 usable area (210 mm − 12 mm × 2 = 186 mm)
+      // so content reflows to the same proportions as the simple html2pdf path.
+      root.style.width    = "186mm";
+      root.style.maxWidth = "186mm";
+
+      // ---- KEY FIX: break huge tables into manageable sub-tables ----
+      // A single 11 000-row <table> is one DOM child.  Even though we
+      // chunk by children, html2canvas still has to render that whole
+      // table onto one canvas — easily exceeding browser pixel limits.
+      // By splitting the table first, every child stays small.
+      var MAX_CHUNK_PX = 3000;
+      splitOversizedTables(root, MAX_CHUNK_PX);
+
+      // Now collect children and build chunks
+      var children = Array.from(root.children);
+      if (children.length === 0) {
+        if (wrapper.parentNode) document.body.removeChild(wrapper);
+        status.textContent = "Nothing to export";
+        return;
+      }
+
+      var chunks = [];
+      var cur = [], curH = 0;
+      for (var i = 0; i < children.length; i++) {
+        var h = children[i].offsetHeight || children[i].scrollHeight || 50;
+        if (curH + h > MAX_CHUNK_PX && cur.length > 0) {
+          chunks.push(cur);
+          cur = [];
+          curH = 0;
+        }
+        cur.push(children[i]);
+        curH += h;
+      }
+      if (cur.length) chunks.push(cur);
+
+      var rootW      = root.offsetWidth;
+      var rootStyles = root.style.cssText;
+
+      var pdf     = new JsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+      var margin  = 12;
+      var usableW = pdf.internal.pageSize.getWidth()  - margin * 2;
+      var usableH = pdf.internal.pageSize.getHeight() - margin * 2;
+      var yMM     = margin;
+      var chunkIdx = 0;
+
+      function processNext() {
+        if (chunkIdx >= chunks.length) {
+          pdf.save(MLE.getDocumentName() + ".pdf");
+          if (wrapper.parentNode) document.body.removeChild(wrapper);
+          status.textContent = "PDF exported";
+          status.className = "pane-meta status-ready";
+          MLE.showToast("PDF exported successfully", "success");
+          return;
+        }
+
+        status.textContent =
+          "Exporting " + Math.round(((chunkIdx + 1) / chunks.length) * 100) + "%…";
+
+        // Build an off-screen container for this chunk
+        var box = document.createElement("div");
+        box.style.cssText  = rootStyles;
+        box.style.width    = rootW + "px";
+        box.style.position = "absolute";
+        box.style.left = "0";
+        box.style.top  = "0";
+        chunks[chunkIdx].forEach(function (el) {
+          box.appendChild(el.cloneNode(true));
+        });
+        // Re-apply table styles on the cloned nodes for safety
+        applyTableStyles(box);
+        wrapper.appendChild(box);
+
+        h2c(box, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          logging: false,
+          scrollX: 0,
+          scrollY: 0,
+        }).then(function (canvas) {
+          var pxPerMM   = canvas.width / usableW;
+          var totalMM   = canvas.height / pxPerMM;
+          var srcYpx    = 0;
+          var remaining = totalMM;
+
+          while (remaining > 0.5) {
+            var space = (margin + usableH) - yMM;
+            if (space < 1) {
+              pdf.addPage();
+              yMM   = margin;
+              space = usableH;
+            }
+
+            var sliceMM = Math.min(remaining, space);
+            var slicePX = Math.round(sliceMM * pxPerMM);
+
+            if (srcYpx + slicePX > canvas.height) {
+              slicePX = canvas.height - srcYpx;
+              sliceMM = slicePX / pxPerMM;
+            }
+            if (slicePX <= 0) break;
+
+            var strip = document.createElement("canvas");
+            strip.width  = canvas.width;
+            strip.height = slicePX;
+            strip.getContext("2d")
+              .drawImage(canvas, 0, srcYpx, canvas.width, slicePX,
+                                  0, 0,     canvas.width, slicePX);
+
+            pdf.addImage(
+              strip.toDataURL("image/jpeg", 0.95),
+              "JPEG", margin, yMM, usableW, sliceMM
+            );
+
+            yMM      += sliceMM;
+            srcYpx   += slicePX;
+            remaining -= sliceMM;
+          }
+
+          wrapper.removeChild(box);
+          chunkIdx++;
+          setTimeout(processNext, 10);
+        }).catch(function (err) {
+          console.error("PDF chunk error:", err);
+          if (box.parentNode) wrapper.removeChild(box);
+          chunkIdx++;
+          setTimeout(processNext, 10);
+        });
+      }
+
+      processNext();
+    });
+  }
+
+  /* ---- Entry point ---- */
   function exportPdf() {
     if (typeof html2pdf === "undefined") {
-      MLE.showToast("PDF exporter loading...", "error");
+      MLE.showToast("PDF exporter loading…", "error");
       return;
     }
 
-    var editor = document.getElementById("editor");
+    var editor  = document.getElementById("editor");
     var preview = document.getElementById("preview");
-    var status = document.getElementById("status");
+    var status  = document.getElementById("status");
 
     if (!editor.value.trim()) {
       MLE.showToast("Nothing to export", "error");
       return;
     }
 
-    status.textContent = "Exporting...";
-    status.className = "pane-meta";
+    status.textContent = "Exporting…";
+    status.className   = "pane-meta";
 
     var wrapper = document.createElement("div");
     wrapper.style.cssText =
@@ -200,33 +470,18 @@
 
     requestAnimationFrame(function () {
       setTimeout(function () {
-        var options = {
-          margin: [12, 12, 12, 12],
-          filename: MLE.getDocumentName() + ".pdf",
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: "#ffffff",
-            logging: false,
-            scrollX: 0,
-            scrollY: 0,
-          },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ["css", "legacy"] },
-        };
+        // Detect whether the content would exceed safe canvas limits.
+        // Browser canvas-area caps: Chrome ~268 M, Firefox ~124 M, Safari ~67 M.
+        // We use 60 M as a conservative cross-browser threshold.
+        var scale = 2;
+        var MAX_SAFE_AREA = 60000000;
+        var area = (root.scrollWidth * scale) * (root.scrollHeight * scale);
 
-        html2pdf().set(options).from(root).save().then(function () {
-          document.body.removeChild(wrapper);
-          status.textContent = "PDF exported";
-          status.className = "pane-meta status-ready";
-          MLE.showToast("PDF exported successfully", "success");
-        }).catch(function () {
-          if (wrapper.parentNode) document.body.removeChild(wrapper);
-          status.textContent = "Export failed";
-          status.className = "pane-meta";
-          MLE.showToast("PDF export failed", "error");
-        });
+        if (area > MAX_SAFE_AREA) {
+          exportPdfChunked(root, wrapper, status);
+        } else {
+          exportPdfSimple(root, wrapper, status);
+        }
       }, 100);
     });
   }
